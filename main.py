@@ -1,38 +1,40 @@
 from aiogram import Bot, Dispatcher, types, executor
 from config import TELEGRAM_TOKEN
-from kebord.keyboards import get_keybord_1, get_keybord_2
+from kebord.keyboards import (get_keybord_1, get_keybord_2)
 from kebord.key_inline import get_keybord_inlain, get_keybord_inlain_2, get_keybord_inlain_3, get_keybord_inlain_4
 import random
 from datetime import datetime
-from database.database import inttialize_db, add_user, get_user
+from database.database import initialize_db, add_user, get_user
 
-
-bot = Bot(token= TELEGRAM_TOKEN)
+bot = Bot(token=TELEGRAM_TOKEN)
 dp = Dispatcher(bot)
 
+initialize_db()
 
-inttialize_db
-
-
-
-async  def  set_commands(bot: Bot):
+async def set_commands(bot: Bot):
     commands = [
-        types.BotCommand(command= '/start', description= 'Команда для запуска бота'),
-        types.BotCommand(command='/help', description='Команда для получение инфромации'),
-        types.BotCommand(command='/kik', description='Команда для кика учястника бота'),
-        types.BotCommand(command='/mute', description='Команда для мута учясткика'),
-        types.BotCommand(command='/unmute', description='Команда для размута учясткика')
+        types.BotCommand(command='/start', description='Команда для запуска бота'),
+        types.BotCommand(command='/help', description='Команда для получения информации'),
+        types.BotCommand(command='/kick', description='Команда для кика участника бота'),
+        types.BotCommand(command='/mute', description='Команда для мута участника'),
+        types.BotCommand(command='/unmute', description='Команда для размута участника')
     ]
     await bot.set_my_commands(commands)
 
-@dp.message_handler(commands= 'start')
+@dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     user = get_user(message.from_user.id)
-    if user is None:
+    if not user:
         add_user(message.from_user.id, message.from_user.username, message.from_user.first_name, message.from_user.last_name)
-        await message.answer('Привет!',reply_markup= get_keybord_1())
+        text = 'Привет! Я рад видеть нового пользователя.'
     else:
-        await message.answer('Привет!', reply_markup=get_keybord_1())
+        text = 'Привет! Рад тебя видеть снова.'
+
+    await message.answer(text, reply_markup=get_keybord_1())
+    await message.answer('Ты на клавеатуре 1', reply_markup=get_keybord_inlain_3())
+
+
+
 
 
 
@@ -71,17 +73,10 @@ async def button_3_click(message: types.Message):
 async def button_4_click(message: types.Message):
     await message.answer('Тут кот', reply_markup= get_keybord_1())
 
-@dp.message_handler(lambda message: message.text == 'Переход обратно')
-async def button_4_click(message: types.Message):
-    await message.answer('Тут кот', reply_markup= get_keybord_1())
-
-@dp.message_handler(lambda message: message.text == 'Переход обратно')
-async def button_4_click(message: types.Message):
-    await message.answer('Тут кот', reply_markup= get_keybord_1())
 
 @dp.message_handler(commands= 'help')
 async def help(message: types.Message):
-    await message.answer('Ты на клавеатуре 1',reply_markup= get_keybord_inlain_3())
+    await message.answer('Ты на клавеатуре 1')
 
 @dp.message_handler(commands= 'kik')
 async def kik(message: types.Message):
